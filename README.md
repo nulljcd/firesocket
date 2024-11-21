@@ -71,13 +71,14 @@ fireSocket.isConnected; // If you are connected or not
 fireSocket.connectedUsers; // All connected users
 ```
 ## Example website
+Copy and paste the code below or go to this website https://nulljcd.github.io/chat
 ```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <title></title>
+  <title>chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <style>
     html {
