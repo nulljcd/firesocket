@@ -5,10 +5,10 @@ import { getDatabase, ref, set, update, onDisconnect, remove, onValue } from "ht
 export default class FireSocket {
   constructor(firebaseConfig) {
     this.firebaseConfig = firebaseConfig;
-
-    this.app = null;
-    this.database = null;
-    this.auth = null;
+    
+    this.app = initializeApp(this.firebaseConfig);
+    this.database = getDatabase(this.app);
+    this.auth = getAuth();
 
     this.userId;
     this.usersRef;
@@ -21,36 +21,20 @@ export default class FireSocket {
     this.onConnection = undefined;
     this.onDisconnection = undefined;
     this.onBroadcast = undefined;
-  }
 
-  initialize() {
-    return new Promise((resolve, reject) => {
-      this.app = initializeApp(this.firebaseConfig);
-      this.database = getDatabase(this.app);
-      this.auth = getAuth();
-
-      onAuthStateChanged(this.auth, user => {
-        if (user) {
-          this.userId = user.uid;
-          this.usersRef = ref(this.database, "users");
-          this.userRef = ref(this.database, `users/${this.userId}`);
-
-          this.connect().then(() => {
-            resolve();
-          }).catch((error) => {
-            reject(error);
-          });
-
-          onDisconnect(this.userRef).remove();
-
-          this.handleServer();
-        }
-      });
-
-      signInAnonymously(this.auth).catch((error) => {
-        reject(error);
-      });
+    onAuthStateChanged(this.auth, user => {
+      if (user) {
+        this.userId = user.uid;
+        this.usersRef = ref(this.database, "users");
+        this.userRef = ref(this.database, `users/${this.userId}`);
+        
+        onDisconnect(this.userRef).remove();
+        this.connect();
+        this.handleServer();
+      }
     });
+
+    signInAnonymously(this.auth);
   }
 
   handleServer() {
