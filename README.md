@@ -23,7 +23,12 @@ initialization
 import FireSocket from "https://nulljcd.github.io/firesocket/firesocket.js";
 
 let fireSocket = new FireSocket(yourFirebaseConfig);
-// You are automatically connected on initialization
+
+fireSocket.initialize().then(() => {
+  // fireSocket initialized successfully
+}).catch((error) => {
+
+});
 ```
 methods
 ```js
