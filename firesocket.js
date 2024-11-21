@@ -90,7 +90,7 @@ export default class FireSocket {
         if (userData == null) {
           if (this.onDisconnection) {
             callQueue.push({
-              type: "disconnected",
+              type: "disconnection",
               userId: lastUserData.id
             });
           }
