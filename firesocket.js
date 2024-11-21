@@ -5,10 +5,10 @@ import { getDatabase, ref, set, update, onDisconnect, remove, onValue } from "ht
 export default class FireSocket {
   constructor(firebaseConfig) {
     this.firebaseConfig = firebaseConfig;
-    
-    this.app = initializeApp(this.firebaseConfig);
-    this.database = getDatabase(this.app);
-    this.auth = getAuth();
+
+    this.app = null;
+    this.database = null;
+    this.auth = null;
 
     this.userId;
     this.usersRef;
@@ -21,31 +21,43 @@ export default class FireSocket {
     this.onConnection = undefined;
     this.onDisconnection = undefined;
     this.onBroadcast = undefined;
+  }
 
-    onAuthStateChanged(this.auth, user => {
-      if (user) {
-        this.userId = user.uid;
-        this.usersRef = ref(this.database, "users");
-        this.userRef = ref(this.database, `users/${this.userId}`);
-        
-        onDisconnect(this.userRef).remove();
-        this.connect();
-        this.handleServer();
-      }
+  initialize() {
+    return new Promise((resolve, reject) => {
+      this.app = initializeApp(this.firebaseConfig);
+      this.database = getDatabase(this.app);
+      this.auth = getAuth();
+
+      onAuthStateChanged(this.auth, user => {
+        if (user) {
+          this.userId = user.uid;
+          this.usersRef = ref(this.database, "users");
+          this.userRef = ref(this.database, `users/${this.userId}`);
+
+          this.connect().then(() => {
+            resolve();
+          }).catch((error) => {
+            reject(error);
+          });
+
+          onDisconnect(this.userRef).remove();
+
+          this.handleServer();
+        }
+      });
+
+      signInAnonymously(this.auth).catch((error) => {
+        reject(error);
+      });
     });
-
-    signInAnonymously(this.auth);
   }
 
   handleServer() {
     onValue(this.usersRef, (snapshot) => {
       let usersData = snapshot.val();
 
-      let endCallData = {
-        type: null,
-        userId: null,
-        userBroadcastData: null
-      };
+      let callQueue = [];
 
       for (let key in usersData) {
         let userData = usersData[key];
@@ -53,17 +65,21 @@ export default class FireSocket {
 
         if (!lastUserData) {
           if (this.onConnection) {
-            endCallData.type = "connection";
-            endCallData.userId = userData.id;
+            callQueue.push({
+              type: "connection",
+              userId: userData.id
+            });
           }
 
           if (this.userId === userData.id)
             this.isConnected = true;
         } else if (lastUserData.broadcastFlag != userData.broadcastFlag)
           if (this.onBroadcast && this.onBroadcast) {
-            endCallData.type = "broadcast";
-            endCallData.userId = userData.id;
-            endCallData.userBroadcastData = userData.broadcastData;
+            callQueue.push({
+              type: "broadcast",
+              userId: userData.id,
+              userBroadcastData: userData.broadcastData
+            });
           }
       }
 
@@ -73,8 +89,10 @@ export default class FireSocket {
 
         if (userData == null) {
           if (this.onDisconnection) {
-            endCallData.type = "disconnection";
-            endCallData.userId = lastUserData.id;
+            callQueue.push({
+              type: "disconnected",
+              userId: lastUserData.id
+            });
           }
 
           if (lastUserData.id === this.userId)
@@ -92,19 +110,21 @@ export default class FireSocket {
         this.connectedUsers.push(userData.id);
       }
 
-      switch (endCallData.type) {
-        case "connection":
-          this.onConnection(endCallData.userId);
-          break;
-        case "disconnection":
-          this.onDisconnection(endCallData.userId);
-          break;
-        case "broadcast":
-          this.onBroadcast(endCallData.userId, endCallData.userBroadcastData);
-          break;
-        default:
-          break;
-      }
+      callQueue.forEach(callData => {
+        switch (callData.type) {
+          case "connection":
+            this.onConnection(callData.userId);
+            break;
+          case "disconnection":
+            this.onDisconnection(callData.userId);
+            break;
+          case "broadcast":
+            this.onBroadcast(callData.userId, callData.userBroadcastData);
+            break;
+          default:
+            break;
+        }
+      });
     });
   }
 
