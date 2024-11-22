@@ -86,6 +86,7 @@ Copy and paste the code below or go to this website https://nulljcd.github.io/ch
     }
 
     body {
+      margin: 0;
       height: 100%;
       display: flex;
       justify-content: center;
