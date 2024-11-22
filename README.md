@@ -1,5 +1,5 @@
 # firesocket
-A Library that makes using firebase realtime database easier for bidirectional communication.
+A library that makes using firebase realtime database simpler for bidirectional communication.
 
 ## How to setup firebase
 - Create a firebase realtime database project
