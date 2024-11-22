@@ -88,6 +88,8 @@ Copy and paste the code below or go to this website https://nulljcd.github.io/ch
     body {
       margin: 0;
       height: 100%;
+      background: #1f1c23;
+      color: #a198a9;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -98,7 +100,7 @@ Copy and paste the code below or go to this website https://nulljcd.github.io/ch
     #messagesContainer {
       width: 300px;
       height: 300px;
-      border: 2px solid gray;
+      border: 2px solid #a198a9;
       overflow-y: scroll;
     }
 
@@ -114,11 +116,13 @@ Copy and paste the code below or go to this website https://nulljcd.github.io/ch
       padding-top: 5px;
       padding-bottom: 5px;
       border-radius: 0;
-      border: 2px solid gray;
+      border: 2px solid #a198a9;
       height: 20px;
       width: 300px;
       font-family: monospace;
       font-size: 16px;
+      background: #1f1c23;
+      color: #a198a9;
       resize: none;
     }
   </style>
