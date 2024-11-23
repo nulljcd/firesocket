@@ -35,15 +35,9 @@ export default class FireSocket {
           this.usersRef = ref(this.database, "users");
           this.userRef = ref(this.database, `users/${this.userId}`);
 
-          this.connect().then(() => {
-            resolve();
-          }).catch((error) => {
-            reject(error);
-          });
-
-          onDisconnect(this.userRef).remove();
-
           this.handleServer();
+
+          resolve();
         }
       });
 
@@ -54,6 +48,8 @@ export default class FireSocket {
   }
 
   handleServer() {
+    onDisconnect(this.userRef).remove();
+
     onValue(this.usersRef, (snapshot) => {
       let usersData = snapshot.val();
 
