@@ -26,6 +26,7 @@ let fireSocket = new FireSocket(yourFirebaseConfig);
 
 fireSocket.initialize().then(() => {
   // fireSocket initialized successfully
+  // Now you can connect
 }).catch((error) => {
 
 });
@@ -148,22 +149,24 @@ Copy and paste the code below and change out your firebaseConfig or go to this w
     let fireSocket = new FireSocket(yourFirebaseConfig);
 
     fireSocket.initialize().then(() => {
-      window.onkeydown = e => {
-        document.querySelector("#input").focus();
-        if (e.code == "Enter") {
-          e.preventDefault();
-          let broadcastData = document.querySelector("#input").value;
-          if (broadcastData.length > 0)
-            fireSocket.broadcast(broadcastData);
-          document.querySelector("#input").value = "";
-          document.querySelector("#input").blur();
-        }
-      };
+      fireSocket.connect();
     });
 
     fireSocket.onConnection = (userId) => pushMessage(`-> ${userId.substring(0, 6)}`);
     fireSocket.onDisconnection = (userId) => pushMessage(`<- ${userId.substring(0, 6)}`);
     fireSocket.onBroadcast = (userId, data) => pushMessage(`${userId.substring(0, 6)} ->${"\n"}${data}`);
+
+    window.onkeydown = e => {
+      document.querySelector("#input").focus();
+      if (e.code == "Enter") {
+        e.preventDefault();
+        let broadcastData = document.querySelector("#input").value;
+        if (broadcastData.length > 0)
+          fireSocket.broadcast(broadcastData);
+        document.querySelector("#input").value = "";
+        document.querySelector("#input").blur();
+      }
+    };
   </script>
 </body>
 
