@@ -148,9 +148,7 @@ Copy and paste the code below and change out your firebaseConfig or go to this w
 
     let fireSocket = new FireSocket(yourFirebaseConfig);
 
-    fireSocket.initialize().then(() => {
-      fireSocket.connect();
-    });
+    fireSocket.initialize().then(() => fireSocket.connect());
 
     fireSocket.onConnection = (userId) => pushMessage(`-> ${userId.substring(0, 6)}`);
     fireSocket.onDisconnection = (userId) => pushMessage(`<- ${userId.substring(0, 6)}`);
