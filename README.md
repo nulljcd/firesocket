@@ -72,7 +72,7 @@ fireSocket.isConnected; // If you are connected or not
 fireSocket.connectedUsers; // All connected user's ids
 ```
 ## Example website
-Copy and paste the code below and change out your firebaseConfig or go to this website https://nulljcd.github.io/chat
+Copy and paste the code below and change out your firebaseConfig
 ```html
 <!DOCTYPE html>
 <html lang="en">
